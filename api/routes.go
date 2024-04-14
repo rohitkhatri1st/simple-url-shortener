@@ -10,6 +10,7 @@ func (a *API) InitRoutes() {
 	a.Router.APIRoot.HandleFunc("/health-check", a.healthCheck).Methods(http.MethodGet)
 
 	a.Router.APIRoot.HandleFunc("/shorten", a.shortenUrl).Methods(http.MethodPost)
+	a.Router.Root.HandleFunc("/{shortKey}", a.redirect).Methods(http.MethodGet)
 }
 
 func (a *API) healthCheck(w http.ResponseWriter, r *http.Request) {

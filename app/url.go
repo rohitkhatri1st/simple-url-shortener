@@ -14,6 +14,7 @@ import (
 
 type Url interface {
 	ShortenUrl(shortenUrlRequest *model.ShortenUrlRequest) (*model.ShortenUrlResp, error)
+	GetOriginalUrlFromShortKey(shortKey string) (string, error)
 }
 
 type UrlImplOpts struct {
@@ -42,12 +43,22 @@ func InitUrl(opts *UrlImplOpts) Url {
 	return &ui
 }
 
+func (ui UrlImpl) GetOriginalUrlFromShortKey(shortKey string) (string, error) {
+	urlData, err := ui.Db.UrlData.FindUrlByShortKeyIndex(shortKey)
+	if err != nil {
+		return "", err
+	}
+	return urlData, nil
+}
+
 func (ui UrlImpl) ShortenUrl(shortenUrlRequest *model.ShortenUrlRequest) (*model.ShortenUrlResp, error) {
+	// Adding Mutex so that same url does not get converted twice. It can be removed
+	// as it may slow down performance if multiple shortUrls or errors are tolerable.
 	ui.Mutex.Lock()
 	defer ui.Mutex.Unlock()
 
 	shortKey := ui.generateShortKey()
-	shortenUrl := "http://localhost:8000/" + shortKey
+	shortenUrl := "http://localhost:8001/" + shortKey
 
 	// Trimming these so that we don't treat "google.com" and "google.com/" as different urls
 	originalUrl := strings.Trim(shortenUrlRequest.OriginalUrl, "?")
@@ -61,14 +72,15 @@ func (ui UrlImpl) ShortenUrl(shortenUrlRequest *model.ShortenUrlRequest) (*model
 	urlData := model.UrlData{
 		ShortenUrl:  shortenUrl,
 		OriginalUrl: originalUrl,
+		ShortKey:    shortKey,
 	}
 
-	urlDataFromDb := model.UrlData{}
+	urlDataFromDb := &model.UrlData{}
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		urlDataFromDb = ui.Db.UrlData.InsertUniqueAndGet(shortenUrlRequest.OriginalUrl, urlData).(model.UrlData)
+		urlDataFromDb = ui.Db.UrlData.InsertUniqueAndGet(originalUrl, urlData)
 	}()
 	wg.Add(1)
 	go func() {
