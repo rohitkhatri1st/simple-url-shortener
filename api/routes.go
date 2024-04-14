@@ -7,7 +7,10 @@ import (
 
 // InitRoutes initializes all the endpoints
 func (a *API) InitRoutes() {
-	a.Router.Root.HandleFunc("/health-check", a.healthCheck).Methods("GET")
+	// We can create a handler function separately that may act as a middleware for additional functionalities.
+	a.Router.Root.HandleFunc("/health-check", a.healthCheck).Methods(http.MethodGet)
+
+	a.Router.Root.HandleFunc("/url", a.shortenUrl).Methods(http.MethodGet)
 }
 
 func (a *API) healthCheck(w http.ResponseWriter, r *http.Request) {
