@@ -80,13 +80,13 @@ func (ui UrlImpl) ShortenUrl(shortenUrlRequest *model.ShortenUrlRequest) (*model
 	defer ui.Mutex.Unlock()
 
 	shortKey := ui.generateShortKey()
-	shortenUrl := "http://localhost:8001/" + shortKey
+	shortenUrl := GetServerAddress() + "/" + shortKey
 
 	// Trimming these so that we don't treat "google.com" and "google.com/" as different urls
 	originalUrl := strings.Trim(shortenUrlRequest.OriginalUrl, "?")
 	originalUrl = strings.Trim(originalUrl, "/")
 
-	originalParsedUrl, err := url.Parse(originalUrl)
+	originalParsedUrl, err := url.ParseRequestURI(originalUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (ui UrlImpl) ShortenUrl(shortenUrlRequest *model.ShortenUrlRequest) (*model
 
 func (ui UrlImpl) generateShortKey() string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	const keyLength = 6
+	const keyLength = model.ShortKeyLength
 	shortKey := make([]byte, keyLength)
 	for i := range shortKey {
 		shortKey[i] = charset[ui.RandomGenerator.Intn(len(charset))]

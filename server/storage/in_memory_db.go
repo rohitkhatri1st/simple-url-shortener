@@ -51,6 +51,7 @@ func (imd InMemoryDb) FindUrlByShortKeyIndex(shortKey string) (string, error) {
 	return indexValue, nil
 }
 
+// Key is the originalUrl
 func (imd InMemoryDb) FindByKey(key string) (*model.UrlData, error) {
 	value, found := imd.Data[key]
 	if !found {

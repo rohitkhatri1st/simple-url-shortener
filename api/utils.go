@@ -95,3 +95,7 @@ func (a *API) SendJsonResponse(w http.ResponseWriter, respCode int, payload inte
 	jsonResponse, _ := json.Marshal(cr)
 	w.Write(jsonResponse)
 }
+
+func GetServerAddress() string {
+	return fmt.Sprintf("%s://%s:%s", model.ServerScheme, model.ServerHost, model.ServerPort)
+}

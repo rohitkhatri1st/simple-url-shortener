@@ -15,7 +15,7 @@ func (a *API) metrics(w http.ResponseWriter, r *http.Request) {
 
 func (a *API) redirect(w http.ResponseWriter, r *http.Request) {
 	shortKey := mux.Vars(r)["shortKey"]
-	notFoundPage := "http://localhost:8001/pages/404"
+	notFoundPage := GetServerAddress() + "/pages/404"
 	if shortKey == "" {
 		http.Redirect(w, r, notFoundPage, http.StatusNotFound)
 		// a.SendJsonResponse(w, http.StatusBadRequest, nil, err)

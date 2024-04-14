@@ -2,11 +2,13 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"simple-url-shortener/api"
 	"simple-url-shortener/app"
 	"simple-url-shortener/app/validator"
+	"simple-url-shortener/model"
 	"simple-url-shortener/server/storage"
 	"time"
 
@@ -59,7 +61,7 @@ func (s *Server) InitLoggers() {
 }
 
 func (s *Server) StartServer() {
-	addr := "localhost:8001"
+	addr := fmt.Sprintf("%s:%s", model.ServerHost, model.ServerPort)
 	s.httpServer = &http.Server{
 		Handler:      s.Router,
 		Addr:         addr,

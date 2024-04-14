@@ -1,7 +1,7 @@
 package model
 
 type ShortenUrlRequest struct {
-	OriginalUrl string `json:"original_url" validate:"required"`
+	OriginalUrl string `json:"original_url" validate:"required,url"`
 }
 
 type UrlData struct {
@@ -19,3 +19,11 @@ type DomainCount struct {
 	Domain string
 	Count  int
 }
+
+const ShortKeyLength = 6
+
+const (
+	ServerScheme = "http"
+	ServerHost   = "localhost"
+	ServerPort   = "8001"
+)
