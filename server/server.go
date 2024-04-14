@@ -6,6 +6,7 @@ import (
 	"os"
 	"simple-url-shortener/api"
 	"simple-url-shortener/app"
+	"simple-url-shortener/app/validator"
 	"simple-url-shortener/server/storage"
 	"time"
 
@@ -39,6 +40,7 @@ func NewServer() *Server {
 	server.API = api.NewAPI(&api.Options{
 		MainRouter: r,
 		Logger:     &apiLogger,
+		Validator:  validator.NewValidation(),
 	})
 	server.API.App = app.NewApp(&app.Options{Logger: &appLogger, Db: storage.NewInMemoryDb()})
 
