@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -62,6 +63,7 @@ func TestUrlImpl_ShortenUrlUnitTest(t *testing.T) {
 	}
 }
 
+// This is not full functional test case but partial without setting up server.
 func TestUrlImpl_ShortenUrlFunctionalTest(t *testing.T) {
 	db := storage.InitDb().UrlDatabase
 	ui := InitUrl(&UrlImplOpts{
@@ -112,4 +114,98 @@ func TestUrlImpl_ShortenUrl_InvalidUrl(t *testing.T) {
 	if err == nil || result != nil {
 		t.Errorf("Error was expected but not found")
 	}
+}
+
+func TestUrlImpl_GetOriginalUrlFromShortKeyUnitTest(t *testing.T) {
+	mockedDatabase := &mocks.InMemoryDb{}
+	mockedDatabase.On("FindUrlByShortKeyIndex", mock.AnythingOfType("string")).
+		Return("http://example.com", nil).
+		Once()
+
+	ui := InitUrl(&UrlImplOpts{
+		App: &App{
+			Logger: &zerolog.Logger{},
+		},
+		Db: &storage.UrlDatabase{
+			UrlData:       mockedDatabase,
+			DomainCounter: mockedDatabase,
+		},
+	})
+
+	expectedOriginalUrl := "http://example.com"
+	result, err := ui.GetOriginalUrlFromShortKey("iYIUZj")
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if result != expectedOriginalUrl {
+		t.Errorf("Expected: %s, Got: %s", expectedOriginalUrl, result)
+	}
+}
+
+// This is not full functional test case but partial without setting up server.
+func TestUrlImpl_GetOriginalUrlFromShortKeyFunctionalTest(t *testing.T) {
+	db := storage.InitDb().UrlDatabase
+	ui := InitUrl(&UrlImplOpts{
+		App: &App{
+			Logger: &zerolog.Logger{},
+		},
+		Db: db,
+	})
+
+	expectedOriginalUrl := "http://example.com"
+	shortenUrlResp, err := ui.ShortenUrl(&model.ShortenUrlRequest{OriginalUrl: expectedOriginalUrl})
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	shortKey := shortenUrlResp.ShortenUrl[len(GetServerAddress())+1:]
+	result, err := ui.GetOriginalUrlFromShortKey(shortKey)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if result != expectedOriginalUrl {
+		t.Errorf("Expected: %s, Got: %s", expectedOriginalUrl, result)
+	}
+}
+
+// This is not full functional test case but partial without setting up server.
+func TestUrlImpl_GetTopDomainsFunctionalTest(t *testing.T) {
+	db := storage.InitDb().UrlDatabase
+	ui := InitUrl(&UrlImplOpts{
+		App: &App{
+			Logger: &zerolog.Logger{},
+		},
+		Db: db,
+	})
+
+	urls := []string{
+		"http://example.com/path1",
+		"http://example.com/path2",
+		"http://google.com",
+		"http://yahoo.com",
+		"http://yahoo.com/path1",
+		"http://bing.com",
+		"http://bing.com/path1",
+		"http://bing.com/path2",
+	}
+	for _, url := range urls {
+		_, err := ui.ShortenUrl(&model.ShortenUrlRequest{OriginalUrl: url})
+		if err != nil {
+			t.Errorf("Unexpected error: %v", err)
+		}
+	}
+	topDomainsResult := ui.GetTopDomains()
+
+	expectedTopDomains := []model.DomainCount{
+		{Domain: "bing.com", Count: 3},
+		{Domain: "example.com", Count: 2},
+		{Domain: "yahoo.com", Count: 2},
+	}
+	assert.Equal(t, len(expectedTopDomains), len(topDomainsResult))
+
+	for i, expected := range expectedTopDomains {
+		assert.Equal(t, expected.Domain, topDomainsResult[i].Domain)
+		assert.Equal(t, expected.Count, topDomainsResult[i].Count)
+	}
+
+	// assert.True(t, reflect.DeepEqual(expectedTopDomains, topDomainsResult))
 }
