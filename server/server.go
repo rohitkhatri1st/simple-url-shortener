@@ -42,7 +42,8 @@ func NewServer() *Server {
 		Logger:     &apiLogger,
 		Validator:  validator.NewValidation(),
 	})
-	server.API.App = app.NewApp(&app.Options{Logger: &appLogger, Db: storage.NewInMemoryDb()})
+
+	server.API.App = app.NewApp(&app.Options{Logger: &appLogger, Db: storage.InitDb()})
 
 	app.InitService(server.API.App)
 	return server

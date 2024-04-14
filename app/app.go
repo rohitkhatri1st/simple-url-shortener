@@ -8,7 +8,7 @@ import (
 
 type App struct {
 	Logger *zerolog.Logger
-	Db     storage.InMemoryDb
+	Db     *storage.InMemoryDatabases
 	// List of services this app is implementing
 	Url Url
 }
@@ -16,7 +16,7 @@ type App struct {
 // Options contains arguments required to create a new app instance
 type Options struct {
 	Logger *zerolog.Logger
-	Db     storage.InMemoryDb
+	Db     *storage.InMemoryDatabases
 }
 
 func NewApp(opts *Options) *App {
