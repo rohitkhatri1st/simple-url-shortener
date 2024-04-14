@@ -8,6 +8,11 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func (a *API) metrics(w http.ResponseWriter, r *http.Request) {
+	topDomains := a.App.Url.GetTopDomains()
+	a.SendJsonResponse(w, http.StatusOK, topDomains)
+}
+
 func (a *API) redirect(w http.ResponseWriter, r *http.Request) {
 	shortKey := mux.Vars(r)["shortKey"]
 	notFoundPage := "http://localhost:8001/pages/404"

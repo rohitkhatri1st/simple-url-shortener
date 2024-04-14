@@ -36,6 +36,10 @@ func NewInMemoryDb() InMemoryDb {
 	return inMemoryDb
 }
 
+func (imd InMemoryDb) FindAll() map[string]interface{} {
+	return imd.Data
+}
+
 func (imd InMemoryDb) FindUrlByShortKeyIndex(shortKey string) (string, error) {
 	indexValue, found := imd.ShortKeyToOriginalUrlIndex[shortKey]
 	if !found {
@@ -61,6 +65,7 @@ func (imd InMemoryDb) Insert(key string, value model.UrlData) {
 	imd.ShortKeyToOriginalUrlIndex[value.ShortKey] = key
 }
 
+// This method is only for DomainCounterDb
 func (imd InMemoryDb) IncreaseCounter(key string) {
 	if val, found := imd.Data[key]; found {
 		imd.Data[key] = val.(int) + 1

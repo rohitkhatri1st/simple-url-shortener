@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"simple-url-shortener/model"
 	"simple-url-shortener/server/storage"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -15,6 +16,7 @@ import (
 type Url interface {
 	ShortenUrl(shortenUrlRequest *model.ShortenUrlRequest) (*model.ShortenUrlResp, error)
 	GetOriginalUrlFromShortKey(shortKey string) (string, error)
+	GetTopDomains() []model.DomainCount
 }
 
 type UrlImplOpts struct {
@@ -41,6 +43,26 @@ func InitUrl(opts *UrlImplOpts) Url {
 		RandomGenerator: rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 	return &ui
+}
+
+func (ui UrlImpl) GetTopDomains() []model.DomainCount {
+	allDomainCounts := ui.Db.DomainCounter.FindAll()
+
+	allDomainCountsSlice := []model.DomainCount{}
+	for domain, count := range allDomainCounts {
+		allDomainCountsSlice = append(allDomainCountsSlice, model.DomainCount{
+			Domain: domain,
+			Count:  count.(int),
+		})
+	}
+	sort.Slice(allDomainCountsSlice, func(i, j int) bool {
+		return allDomainCountsSlice[i].Count > allDomainCountsSlice[j].Count
+	})
+	if len(allDomainCountsSlice) < 4 {
+		return allDomainCountsSlice
+	}
+	topDomains := allDomainCountsSlice[:3]
+	return topDomains
 }
 
 func (ui UrlImpl) GetOriginalUrlFromShortKey(shortKey string) (string, error) {

@@ -14,3 +14,8 @@ type ShortenUrlResp struct {
 	OriginalUrl string `json:"original_url"`
 	ShortenUrl  string `json:"shorten_url"`
 }
+
+type DomainCount struct {
+	Domain string
+	Count  int
+}
