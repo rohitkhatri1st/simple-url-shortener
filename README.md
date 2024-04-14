@@ -39,6 +39,27 @@ go build .
 ```
 By default, the server will start running on port 8001.
 
+#### Running the application with Docker
+To run the application using Docker:
+
+1. Make sure you have Docker installed on your system.
+2. Clone the repository to your local machine (if you haven't already using above mentioned steps):
+3. Navigate to the project directory using above mentioned steps:
+4. Build the Docker image: 
+```bash
+docker build -t simple-url-shortener .
+```
+If above command doesn't work you may try:
+```bash
+docker build --pull --rm -f "dockerfile" -t simple-url-shortener:latest "."
+```
+5. Run the Docker container:
+```bash
+docker run -p 8001:8001 simple-url-shortener
+```
+By default, the server will start running on port 8001.
+
+
 ### Mocking
 You can generate mocks using mockery package of golang.
 

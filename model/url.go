@@ -24,6 +24,6 @@ const ShortKeyLength = 6
 
 const (
 	ServerScheme = "http"
-	ServerHost   = "localhost"
+	ServerHost   = "0.0.0.0"
 	ServerPort   = "8001"
 )
