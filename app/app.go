@@ -1,9 +1,14 @@
 package app
 
-import "github.com/rs/zerolog"
+import (
+	"simple-url-shortener/server/storage"
+
+	"github.com/rs/zerolog"
+)
 
 type App struct {
 	Logger *zerolog.Logger
+	Db     storage.InMemoryDb
 	// List of services this app is implementing
 	Url Url
 }
@@ -11,10 +16,12 @@ type App struct {
 // Options contains arguments required to create a new app instance
 type Options struct {
 	Logger *zerolog.Logger
+	Db     storage.InMemoryDb
 }
 
 func NewApp(opts *Options) *App {
 	return &App{
 		Logger: opts.Logger,
+		Db:     opts.Db,
 	}
 }

@@ -4,6 +4,7 @@ package app
 func InitService(a *App) {
 	a.Url = InitUrl(&UrlImplOpts{
 		App:    a,
+		Db:     a.Db,
 		Logger: a.Logger,
 	})
 }

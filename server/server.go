@@ -6,6 +6,7 @@ import (
 	"os"
 	"simple-url-shortener/api"
 	"simple-url-shortener/app"
+	"simple-url-shortener/server/storage"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -39,7 +40,7 @@ func NewServer() *Server {
 		MainRouter: r,
 		Logger:     &apiLogger,
 	})
-	server.API.App = app.NewApp(&app.Options{Logger: &appLogger})
+	server.API.App = app.NewApp(&app.Options{Logger: &appLogger, Db: storage.NewInMemoryDb()})
 
 	app.InitService(server.API.App)
 	return server
