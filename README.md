@@ -86,3 +86,6 @@ To run the tests for the project, navigate to the project directory and run:
 go test ./...
 ```
 This will run all the tests in the project.
+
+## API Documentation
+You may find the postman API documentation [here](https://documenter.getpostman.com/view/32520716/2sA3Bj7Yzc).
